@@ -57,14 +57,14 @@ export class Users {
         };
 
         const { data } = await axios.post("/api/users/createUser", userdata); //backend deki createUser fonksiyonuna gidecek
-
+        console.log(data);
         if (data && data.status) {
             Swal.fire({
                 title: "Bilgi",
                 text: data.message,// data message loginclass dan geldi ve swal alert2 de gösterildi
                 icon: "success",
             }).then(() => {
-                window.location.href = "/users";// sayfa  yönlendirme
+                window.location.href = "/users";// sayfa yenilenecek
             });
         } else {
             Swal.fire("Hata", data.message, "error");

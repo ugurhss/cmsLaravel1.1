@@ -19,37 +19,29 @@ class UsersClass
 
     public function index()
     {
-        $users = User::select(['id', 'name', 'email', 'phone', 'updated_at']); //burada veri tabanından gerekli olanları çekiyoruz
+        $users = User::select(['id', 'name', 'email', 'phone', 'updated_at']);//burada veri tabanından gerekli olanları cekiyoruz
 
-        return datatables()->of($users) // datatables kütüphanesi ile verileri çekiyoruz
+        return datatables()->of($users)// datatables kütüphanesi ile verileri çekiyoruz
             ->addIndexColumn()
             ->addColumn('action', function ($user) {
-                // burada kullanıcıya düzenle ve sil butonları ekliyoruz
-                $editUrl = route('useredit', ['id' => $user->id]);
-                $deleteUrl = route('userdelete', ['id' => $user->id]);
-
-                return '
-                    <a href="' . $editUrl . '" class="btn btn-sm btn-primary">Düzenle</a>
-                    <a href="' . $deleteUrl . '" class="btn btn-sm btn-danger" onclick="return confirm(\'Bu kullanıcıyı silmek istediğinize emin misiniz?\')">Sil</a>
-                ';
+                return '<a href="/users/edit/'.$user->id.'" class="btn btn-sm btn-primary">Düzenle</a>';
             })
-            ->rawColumns(['action']) // HTML içeriğini işlemek için rawColumns kullanıyoruz
+            ->rawColumns(['action'])
             ->make(true);
     }
 
 
 
-    public function createUser()
+    public function createUser(Request $request)
     {
         try {
-
-            $name_surname = request()->get('name_surname'); //getle olanlar front end tarafında formdan gelen veriler
-            $email = request()->get('email');
-            $phone = request()->get('phone');
-            $password = request()->get('password');
-            $password_rep = request()->get('password_rep');
-            $status = request()->get('status');
-            $user_id = request()->get('user_id');
+            $name_surname = $request->get('name_surname');
+            $email = $request->get('email');
+            $phone = $request->get('phone');
+            $password = $request->get('password');
+            $password_rep = $request->get('password_rep');
+            $status = $request->get('status');
+            $user_id = $request->get('user_id');
 
             if ($name_surname == null) {
                 return ["status" => false, "message" => "Ad Soyad alanı boş olamaz."];
@@ -59,9 +51,8 @@ class UsersClass
                 return ["status" => false, "message" => "E-Mail alanı boş olamaz."];
             }
 
-
-
             if ($user_id == null) {
+                // Yeni kullanıcı oluşturuluyor
                 $mailCheck = User::where('email', $email)->first();
                 if ($mailCheck) {
                     return ["status" => false, "message" => "Bu e-mail adresi ile daha önce kayıt yapılmış."];
@@ -80,14 +71,17 @@ class UsersClass
                 }
 
                 $user = new User();
-                $user->create_user_id = FacadesAuth::user()->id;// kullanıcı id'sini alıyoruz
-                $user->password = Hash::make($password);//  şifreyi hashliyoruz
-                $user->updated_at = null;
+                $user->create_user_id = FacadesAuth::user()->id;
+                $user->password = Hash::make($password);
             } else {
-
+                // Var olan kullanıcı güncelleniyor
                 $user = User::find($user_id);
+                if (!$user) {
+                    return ["status" => false, "message" => "Kullanıcı bulunamadı."];
+                }
+
                 $user->update_user_id = FacadesAuth::user()->id;
-                $user->updated_at = Carbon::now();// güncellenme tarihini alıyoruz
+                $user->updated_at = Carbon::now();
 
                 if ($password != null) {
                     if ($password_rep == null) {
@@ -102,40 +96,32 @@ class UsersClass
                 }
             }
 
-
-
-
-
+            // Ortak alanlar (create ve update için geçerli)
             $user->name = $name_surname;
             $user->email = $email;
             $user->phone = $phone;
             $user->status = $status;
 
             if ($user->save()) {
-                return ["status" => true, "message" => "Kullanıcı kaydı başarıyla " . ($user_id == null ? 'gerçekleşti' : 'güncellendi') . "."];
+                return [
+                    "status" => true,
+                    "message" => "Kullanıcı kaydı başarıyla " . ($user_id == null ? 'gerçekleşti' : 'güncellendi') . "."
+                ];
             } else {
                 return ["status" => false, "message" => "Kullanıcı kaydı sırasında bir hata oluştu."];
             }
         } catch (\Throwable $th) {
-            return ["status" => false, "message" => "Kullanıcı kaydı sırasında bir hata oluştu."];
+            return [
+                "status" => false,
+                "message" => "Kullanıcı kaydı sırasında bir hata oluştu.",
+                "error" => $th->getMessage(), // geçici debug
+                "line" => $th->getLine()
+            ];
         }
-
     }
 
-public function deleteUser($id)
-{
-    try {
-        $user = User::find($id);
-        if ($user) {
-            $user->delete();
-            return ["status" => true, "message" => "Kullanıcı başarıyla silindi."];
-        } else {
-            return ["status" => false, "message" => "Kullanıcı bulunamadı."];
-        }
-    } catch (\Throwable $th) {
-        return ["status" => false, "message" => "Kullanıcı silinirken bir hata oluştu."];
-    }
 
-}
+
+
 
 }

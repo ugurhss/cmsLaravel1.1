@@ -19,31 +19,24 @@ class UsersClass
 
     public function index()
     {
-        $users = User::select(['id', 'name', 'email', 'phone', 'updated_at']); //burada veri tabanından gerekli olanları çekiyoruz
+        $users = User::select(['id', 'name', 'email', 'phone', 'updated_at']);//burada veri tabanından gerekli olanları cekiyoruz
 
-        return datatables()->of($users) // datatables kütüphanesi ile verileri çekiyoruz
+        return datatables()->of($users)// datatables kütüphanesi ile verileri çekiyoruz
             ->addIndexColumn()
             ->addColumn('action', function ($user) {
-                // burada kullanıcıya düzenle ve sil butonları ekliyoruz
-                $editUrl = route('useredit', ['id' => $user->id]);
-                $deleteUrl = route('userdelete', ['id' => $user->id]);
-
-                return '
-                    <a href="' . $editUrl . '" class="btn btn-sm btn-primary">Düzenle</a>
-                    <a href="' . $deleteUrl . '" class="btn btn-sm btn-danger" onclick="return confirm(\'Bu kullanıcıyı silmek istediğinize emin misiniz?\')">Sil</a>
-                ';
+                return '<a href="/users/edit/'.$user->id.'" class="btn btn-sm btn-primary">Düzenle</a>';
             })
-            ->rawColumns(['action']) // HTML içeriğini işlemek için rawColumns kullanıyoruz
+            ->rawColumns(['action'])
             ->make(true);
     }
 
 
 
-    public function createUser()
+    public function createUser(Request $request)
     {
         try {
 
-            $name_surname = request()->get('name_surname'); //getle olanlar front end tarafında formdan gelen veriler
+            $name_surname = request()->get('name_surname');//get kısımları formdan gelen verileri alır
             $email = request()->get('email');
             $phone = request()->get('phone');
             $password = request()->get('password');
@@ -80,14 +73,13 @@ class UsersClass
                 }
 
                 $user = new User();
-                $user->create_user_id = FacadesAuth::user()->id;// kullanıcı id'sini alıyoruz
-                $user->password = Hash::make($password);//  şifreyi hashliyoruz
+                $user->create_user_id = FacadesAuth::user()->id;// kullanıcı id'sini alır
+                $user->password = Hash::make($password);// şifreyi hashler
                 $user->updated_at = null;
-            } else {
 
-                $user = User::find($user_id);
+                $user = User::find($user_id);// kullanıcıyı bulur
                 $user->update_user_id = FacadesAuth::user()->id;
-                $user->updated_at = Carbon::now();// güncellenme tarihini alıyoruz
+                $user->updated_at = Carbon::now();// güncellenme tarihini alır
 
                 if ($password != null) {
                     if ($password_rep == null) {
@@ -106,7 +98,7 @@ class UsersClass
 
 
 
-            $user->name = $name_surname;
+            $user->name = $name_surname; //modeldeki name alanına formdan gelen name_surname değerini atar
             $user->email = $email;
             $user->phone = $phone;
             $user->status = $status;
@@ -119,23 +111,9 @@ class UsersClass
         } catch (\Throwable $th) {
             return ["status" => false, "message" => "Kullanıcı kaydı sırasında bir hata oluştu."];
         }
-
     }
 
-public function deleteUser($id)
-{
-    try {
-        $user = User::find($id);
-        if ($user) {
-            $user->delete();
-            return ["status" => true, "message" => "Kullanıcı başarıyla silindi."];
-        } else {
-            return ["status" => false, "message" => "Kullanıcı bulunamadı."];
-        }
-    } catch (\Throwable $th) {
-        return ["status" => false, "message" => "Kullanıcı silinirken bir hata oluştu."];
-    }
 
-}
+
 
 }

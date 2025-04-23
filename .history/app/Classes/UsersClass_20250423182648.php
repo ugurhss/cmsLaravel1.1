@@ -136,6 +136,6 @@ public function deleteUser($id)
         return ["status" => false, "message" => "Kullanıcı silinirken bir hata oluştu."];
     }
 
-}
+
 
 }

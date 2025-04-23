@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 
-Route::get('/intro', [PagesController::class, 'intro'])->name('intro');
-
-
 Route::get('/',function(){
    if(Auth::check()){
        return redirect()->route('dashboard');
@@ -32,4 +29,3 @@ Route::get('/users/create',[UsersController::class,'create'])->name('userscreate
 Route::post('/api/users/createUser', [UsersApiController::class, 'create'])->middleware('auth');
 
 Route::get('/users/edit/{id}',[UsersController::class,'edit'])->name('useredit')->middleware('auth');
-Route::get('/users/delete/{id}', [UsersApiController::class, 'delete'])->name('userdelete');

@@ -122,20 +122,8 @@ class UsersClass
 
     }
 
-public function deleteUser($id)
-{
-    try {
-        $user = User::find($id);
-        if ($user) {
-            $user->delete();
-            return ["status" => true, "message" => "Kullanıcı başarıyla silindi."];
-        } else {
-            return ["status" => false, "message" => "Kullanıcı bulunamadı."];
-        }
-    } catch (\Throwable $th) {
-        return ["status" => false, "message" => "Kullanıcı silinirken bir hata oluştu."];
-    }
 
-}
+
+
 
 }

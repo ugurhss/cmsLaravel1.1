@@ -18,7 +18,7 @@ export class Users {
         let self = this;
         $("body")
         .on("click", ".saveUserBtn", function () {
-
+            alert("saveUserBtn tetiklendi");
             //butona tıklandığında saveUserBtn classı tetiklenecek
             self.saveUser();
         })
@@ -55,16 +55,14 @@ export class Users {
             status: $(".status").val(),
             user_id: $(".user_id").val(),
         };
-
         const { data } = await axios.post("/api/users/createUser", userdata); //backend deki createUser fonksiyonuna gidecek
-
         if (data && data.status) {
             Swal.fire({
                 title: "Bilgi",
                 text: data.message,// data message loginclass dan geldi ve swal alert2 de gösterildi
                 icon: "success",
             }).then(() => {
-                window.location.href = "/users";// sayfa  yönlendirme
+                window.location.href = "/users";// sayfa yenilenecek
             });
         } else {
             Swal.fire("Hata", data.message, "error");

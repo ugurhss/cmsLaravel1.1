@@ -18,10 +18,5 @@ class UsersApiController
 
       return response()->json($usercreate->createUser());
     }
-    public function delete($id)
-    {
-        $userdelete = new UsersClass();
-        return response()->json($userdelete->deleteUser($id));
-    }
 
 }

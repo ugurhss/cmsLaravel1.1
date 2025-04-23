@@ -19,21 +19,14 @@ class UsersClass
 
     public function index()
     {
-        $users = User::select(['id', 'name', 'email', 'phone', 'updated_at']); //burada veri tabanından gerekli olanları çekiyoruz
+        $users = User::select(['id', 'name', 'email', 'phone', 'updated_at']);//burada veri tabanından gerekli olanları cekiyoruz
 
-        return datatables()->of($users) // datatables kütüphanesi ile verileri çekiyoruz
+        return datatables()->of($users)// datatables kütüphanesi ile verileri çekiyoruz
             ->addIndexColumn()
             ->addColumn('action', function ($user) {
-                // burada kullanıcıya düzenle ve sil butonları ekliyoruz
-                $editUrl = route('useredit', ['id' => $user->id]);
-                $deleteUrl = route('userdelete', ['id' => $user->id]);
-
-                return '
-                    <a href="' . $editUrl . '" class="btn btn-sm btn-primary">Düzenle</a>
-                    <a href="' . $deleteUrl . '" class="btn btn-sm btn-danger" onclick="return confirm(\'Bu kullanıcıyı silmek istediğinize emin misiniz?\')">Sil</a>
-                ';
+                return '<a href="' . route('useredit', ['id' => $user->id]) . '" class="btn btn-sm btn-primary">Düzenle</a>';
             })
-            ->rawColumns(['action']) // HTML içeriğini işlemek için rawColumns kullanıyoruz
+            ->rawColumns(['action'])
             ->make(true);
     }
 
@@ -122,20 +115,8 @@ class UsersClass
 
     }
 
-public function deleteUser($id)
-{
-    try {
-        $user = User::find($id);
-        if ($user) {
-            $user->delete();
-            return ["status" => true, "message" => "Kullanıcı başarıyla silindi."];
-        } else {
-            return ["status" => false, "message" => "Kullanıcı bulunamadı."];
-        }
-    } catch (\Throwable $th) {
-        return ["status" => false, "message" => "Kullanıcı silinirken bir hata oluştu."];
-    }
 
-}
+
+
 
 }
