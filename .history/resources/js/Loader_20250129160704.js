@@ -1,4 +1,3 @@
-import { Blog } from "./Pages/Blog";
 import { Login } from "./Pages/Login";
 import { Users } from "./Pages/Users";
 
@@ -51,8 +50,6 @@ export class Loader {
                 return new Login();
                 case "Users":
                     return new Users();
-                    case "Blog":
-                    return new Blog();
             default:
                 return null;
         }
